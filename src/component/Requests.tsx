@@ -168,7 +168,7 @@ const Requests: FC<Props> = ({ isROpen, setIsROpen }) => {
     <div
       className={` ${
         !isROpen ? "hidden" : false
-      } h-[80vh] w-[25vw] bg-[#55254b] text-white position: absolute top-12 right-5 z-50 shadow-[0_3px_10px_rgb(0,0,0,0.2)]`}
+      } bg-[#55254b] mx-2 w-[95vw] small-laptop:w-[22rem] small-laptop:right-10 text-white position: absolute z-50 shadow-[0_3px_10px_rgb(0,0,0,0.2)]`}
     >
       <div className="bg-[#975ba1] p-4 ">
         <div className="flex items-center gap-16">

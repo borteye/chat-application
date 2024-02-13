@@ -69,7 +69,7 @@ const Messages: FC = () => {
                 className="w-[32px] h-[32px] rounded-[50%] object-cover"
               />
 
-              <div className="max-w-[60%]">
+              <div className="max-w-[85%] small-laptop:max-w-[55%]">
                 <p className="bg-[#f9b142]  flex items-center justify-center text-white text-sm pt-1 pb-1 pr-4 pl-4 rounded-xl">
                   {conversation?.message}
                 </p>
@@ -163,7 +163,7 @@ const Messages: FC = () => {
   };
 
   return (
-    <section className="w-full h-[calc(100vh-230px)] flex flex-col gap-12  mt-4 overflow-y-scroll no-scrollbar ">
+    <section className="w-full small-laptop:h-[calc(100vh-270px)] h-[calc(100vh-(150px+1rem))] flex flex-col gap-12  mt-4 overflow-y-scroll no-scrollbar ">
       {combinedUid ? (
         <FriendConvoWidget />
       ) : groupUid ? (

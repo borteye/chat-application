@@ -66,7 +66,7 @@ const SendMessage = () => {
   return (
     <form
       onSubmit={handleSendMessage}
-      className=" bg-[#975ba1] w-[70%]  pr-6 pl-6 flex items-center   justify-between rounded-3xl"
+      className=" bg-[#975ba1]  small-laptop:w-[70%] w-[90%]  pr-6 pl-6 flex items-center   justify-between rounded-3xl"
     >
       <input
         type="text"
@@ -75,7 +75,7 @@ const SendMessage = () => {
         onChange={(e) => setText(e.target.value)}
         className="normal-text italic-placeholder w-full pr-2 pl-2 pt-1 pb-1 bg-transparent outline-none text-white "
       />
-      <button>
+      <button className="small-laptop:block hidden">
         <PaperAirplaneIcon className="w-7 h-7 text-white cursor-pointer " />
       </button>
     </form>

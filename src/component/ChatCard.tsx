@@ -9,13 +9,14 @@ import { setActiveGroup, setNonActiveGroup } from "../features/groupSlice";
 import { useDocument } from "react-firebase-hooks/firestore";
 
 interface Props {
+  key: string | undefined;
+  setKey: React.Dispatch<React.SetStateAction<string>>;
   search: string;
 }
 
-const ChatCard: FC<Props> = ({ search }) => {
-  const [key, setKey] = useState<string | undefined>("");
-
+const ChatCard: FC<Props> = ({ search, key, setKey }) => {
   const dispatch = useDispatch();
+  console.log(key);
 
   //* current user uid
   const currentUserUid = useSelector(selectUid);
@@ -82,6 +83,7 @@ const ChatCard: FC<Props> = ({ search }) => {
           }
         })
         ?.map((chat) => {
+          console.log(chat);
           if (chat?.adminName) {
             return (
               <div
@@ -90,7 +92,10 @@ const ChatCard: FC<Props> = ({ search }) => {
                 } p-3 rounded-lg cursor-pointer `}
                 key={chat?.uid}
                 onClick={() => {
-                  setKey(chat?.uid);
+                  if (chat.uid !== undefined) {
+                    console.log(chat?.uid);
+                    setKey(chat?.uid);
+                  }
                   selectChat(chat);
                 }}
               >
@@ -123,7 +128,9 @@ const ChatCard: FC<Props> = ({ search }) => {
                 } p-3 rounded-lg cursor-pointer `}
                 key={chat?.uid}
                 onClick={() => {
-                  setKey(chat?.uid);
+                  if (chat.uid !== undefined) {
+                    setKey(chat?.uid);
+                  }
                   selectChat(chat);
                 }}
               >

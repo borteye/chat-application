@@ -49,12 +49,14 @@ const Update: FC = () => {
 
   return (
     <div className="position: absolute  bg-[#00000081] top-0 h-full w-full flex items-center justify-center">
-      <div className="bg-white w-[27vw] p-10 rounded-xl">
-        <h1 className="text-3xl font-semibold text-center mb-6">Update Info</h1>
-        <form onSubmit={handleUpdate}>
+      <div className="bg-white max-w-[24rem] p-5 rounded-xl">
+        <h1 className=" font-semibold text-center text-2xl medium-tablet:text-3xl mb-6">
+          Update Info
+        </h1>
+        <form onSubmit={handleUpdate} className="flex flex-col gap-6 ">
           {!userDisplayName && (
-            <div className="mb-6 flex items-center bg-[#d5aadb79] gap-2 pr-3 pl-3 rounded-xl">
-              <UserIcon className="w-6 h-6 text-[#55254b] " />
+            <div className="flex items-center bg-[#d5aadb79] gap-2 pr-3 pl-3 rounded-xl">
+              <UserIcon className="w-5 h-5  text-[#55254b] " />
               <input
                 type="text"
                 placeholder="Username"
@@ -66,21 +68,21 @@ const Update: FC = () => {
             </div>
           )}
           {!userOccupation && (
-            <div className="mb-6 flex items-center bg-[#d5aadb79] gap-2 pr-3 pl-3 rounded-xl">
-              <BriefcaseIcon className="w-6 h-6 text-[#55254b] " />
+            <div className="flex items-center bg-[#d5aadb79] gap-2 pr-3 pl-3 rounded-xl">
+              <BriefcaseIcon className="w-5 h-5 medium-tablet:w-7 medium-tablet:h-7 text-[#55254b] " />
               <input
                 type="text"
                 placeholder="Occupation"
                 required
                 value={occupation}
                 onChange={(e) => setOccupation(e.target.value)}
-                className="bg-transparent border-none outline-none pt-2 pb-2 pr-1 pl-1 text-xl"
+                className="bg-transparent w-[70vw] max-w-[18rem] border-none outline-none pt-2 pb-2 pr-1 pl-1 text-xl"
               />
             </div>
           )}
           {!userPhoneNumber && (
-            <div className="mb-6 flex items-center bg-[#d5aadb79] gap-2 pr-3 pl-3 rounded-xl">
-              <PhoneIcon className="w-6 h-6 text-[#55254b] " />
+            <div className="flex items-center bg-[#d5aadb79] gap-2 pr-3 pl-3 rounded-xl">
+              <PhoneIcon className="w-5 h-5 medium-tablet:w-7 medium-tablet:h-7 text-[#55254b] " />
               <input
                 type="text"
                 placeholder="Phone Number"
@@ -89,7 +91,7 @@ const Update: FC = () => {
                 onChange={(e) => setPhone(e.target.value)}
                 pattern="[0-9]*"
                 title="Please enter only numeric characters"
-                className="bg-transparent border-none outline-none pt-2 pb-2 pr-1 pl-1 text-xl"
+                className="bg-transparent w-[70vw] max-w-[18rem] outline-none pt-2 pb-2 pr-1 pl-1 text-xl"
               />
             </div>
           )}

@@ -178,14 +178,14 @@ const DiscoverConnections: FC<Props> = ({ isDFOpen, setIsDFOpen }) => {
     <div
       className={` ${
         !isDFOpen ? "hidden" : false
-      } h-[80vh] w-[25vw] bg-[#55254b] text-white position: absolute top-12 right-5 z-50 shadow-[0_3px_10px_rgb(0,0,0,0.2)]`}
+      }  mx-2 w-[95vw] small-laptop:w-[22rem] small-laptop:right-10 bg-[#55254b] text-white position: absolute  z-50 shadow-[0_3px_10px_rgb(0,0,0,0.2)]`}
     >
       <div className="bg-[#975ba1] p-4 flex flex-col gap-2">
         <div className="flex items-center gap-16">
           <p className="cursor-pointer" onClick={() => setIsDFOpen(false)}>
             Close
           </p>
-          <h1 className="text-xl">Discover Connections</h1>
+          <h1 className="text-xl">Connections</h1>
         </div>
         <div className="mt-2 bg-[#55254b] flex items-center pt-[0.125rem] pb-[0.125] pr-3 pl-3 rounded-2xl">
           <MagnifyingGlassIcon className="w-[1.5rem] h-[1.5rem] text-white" />

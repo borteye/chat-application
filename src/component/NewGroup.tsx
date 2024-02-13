@@ -142,9 +142,9 @@ const NewGroup: FC<Props> = ({ isNGOpen, setIsNGOpen }) => {
 
   return (
     <div
-      className={`bg-white shadow-md h-[calc(100%-2rem)] py-6 w-1/4 position: absolute ${
+      className={`bg-white shadow-md h-[calc(100%-2rem)]  max-w-[40rem]  py-6  position: absolute ${
         isNGOpen ? "top-6" : "top-[-100%]"
-      }  left-60 duration-500 rounded-xl`}
+      }  small-tablet:left-40 small-laptop:left-[17rem] duration-500 rounded-xl`}
     >
       <div className="flex items-center gap-8 mb-4 px-6">
         <ArrowLeftIcon
@@ -247,7 +247,7 @@ const NewGroup: FC<Props> = ({ isNGOpen, setIsNGOpen }) => {
                   (user: BasicFriendInfo) => user?.uid === friend?.uid
                 );
                 return (
-                  <div className="flex items-center justify-between px-6 py-4 hover:bg-[#f9b142]">
+                  <div className="flex  items-center justify-between small-laptop:gap-[2rem] px-6 py-4 hover:bg-[#f9b142]">
                     <div className="flex items-center gap-5">
                       <img
                         src={chat_profile}

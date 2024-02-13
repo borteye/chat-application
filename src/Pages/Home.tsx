@@ -4,11 +4,13 @@ import chat_profile from "../assets/chat_profile.jpg";
 import {
   ChatBubbleLeftEllipsisIcon,
   ArrowLeftEndOnRectangleIcon,
+  ArrowLeftIcon,
   UserGroupIcon,
   MagnifyingGlassIcon,
   PhotoIcon,
   UsersIcon,
   XMarkIcon,
+  EllipsisVerticalIcon,
 } from "@heroicons/react/24/solid";
 import {
   selectDisplayName,
@@ -47,6 +49,8 @@ const Home: FC = () => {
   const [isDFOpen, setIsDFOpen] = useState<boolean>(false);
   const [isROpen, setIsROpen] = useState<boolean>(false);
   const [isNGOpen, setIsNGOpen] = useState<boolean>(false);
+  const [isLogoutOpen, setIsLogoutOpen] = useState<boolean>(false);
+  const [key, setKey] = useState<string>("");
   const [search, setSearch] = useState<string>("");
 
   const dispatch = useDispatch();
@@ -82,9 +86,13 @@ const Home: FC = () => {
   };
 
   return (
-    <div className="bg-[#55254b]">
-      <nav className="flex items-center justify-between bg-[#975ba1] pt-2 pb-2 pr-4 pl-4">
-        <div className="flex gap-3">
+    <div className="bg-[#55254b] h-screen">
+      <nav
+        className={`flex items-center justify-between bg-[#975ba1] pt-2 pb-2 pr-4 pl-4 ${
+          key ? "hidden small-laptop:flex" : "block "
+        }`}
+      >
+        <div className="gap-3 hidden medium-tablet:flex ">
           <img
             src={profile_picture}
             alt="profile picture"
@@ -100,25 +108,65 @@ const Home: FC = () => {
           </div>
         </div>
 
-        <div className="flex items-center gap-x-6  text-gray-200">
+        <div className="flex items-center small-tablet:gap-x-6 gap-x-5 py-3 text-gray-200">
           <div
             onClick={() => {
               setIsDFOpen(true);
               setIsROpen(false);
+              setIsLogoutOpen(false);
             }}
-            className="flex items-center justify-center gap-1 cursor-pointer bg-[#55254b] pt-[1.5px] pb-[1.5px] pr-4 pl-4 rounded-2xl"
+            className="small-tablet:hidden flex items-center justify-center gap-1 cursor-pointer bg-[#55254b] pt-[1.5px] pb-[1.5px] pr-4 pl-4 rounded-2xl text-sm"
           >
-            Discover Connections <UsersIcon className="w-5 h-5" />
+            Connections <UsersIcon className="w-4 h-4" />
+          </div>
+          <div
+            onClick={() => {
+              setIsDFOpen(true);
+              setIsROpen(false);
+              setIsLogoutOpen(false);
+            }}
+            className="small-tablet:flex hidden items-center justify-center gap-1 cursor-pointer bg-[#55254b] pt-[1.5px] pb-[1.5px] pr-4 pl-4 rounded-2xl"
+          >
+            Discover Connections <UsersIcon className="w-5 h-5 " />
           </div>
           <div
             onClick={() => {
               setIsROpen(true);
               setIsDFOpen(false);
+              setIsLogoutOpen(false);
             }}
-            className="flex items-center justify-center gap-1 cursor-pointer bg-[#55254b] pt-[1.5px] pb-[1.5px] pr-4 pl-4 rounded-2xl"
+            className="flex items-center mr-8 small-laptop:mr-0 justify-center gap-1 cursor-pointer bg-[#55254b] py-[1.5px] px-4 rounded-2xl text-sm small-tablet:text-base"
           >
-            Requests <ChatBubbleLeftEllipsisIcon className="w-5 h-5" />
+            Requests
+            <ChatBubbleLeftEllipsisIcon className="small-tablet:w-5 small-tablet:h-5  w-4 h-4" />
             <p>{totalRequests}</p>
+          </div>
+          <div className="absolute right-0 mr-3 small-laptop:hidden cursor-pointer">
+            {isLogoutOpen ? (
+              <EllipsisVerticalIcon
+                className="w-6 h-6 small-tablet:w-8 small-tablet:h-8"
+                onClick={() => setIsLogoutOpen(false)}
+              />
+            ) : (
+              <EllipsisVerticalIcon
+                className="w-6 h-6 small-tablet:w-8 small-tablet:h-8"
+                onClick={() => {
+                  setIsLogoutOpen(true);
+                  setIsDFOpen(false);
+                  setIsROpen(false);
+                }}
+              />
+            )}
+
+            <div
+              className={`absolute  ${
+                isLogoutOpen ? "top-6" : "top-[-1000%]"
+              } duration-500 right-0 bg-[#9954a5] cursor-pointer font-medium text-lg text-white w-[35vw] text-center py-2 mt-4 flex items-center justify-center gap-x-2 shadow-[0_3px_10px_rgb(0,0,0,0.2)] rounded-lg`}
+              onClick={signOut}
+            >
+              <ArrowLeftEndOnRectangleIcon className="w-6 h-6 small-tablet:w-8 small-tablet:h-8" />
+              Logout
+            </div>
           </div>
         </div>
       </nav>
@@ -126,18 +174,26 @@ const Home: FC = () => {
 
       <DiscoverConnections isDFOpen={isDFOpen} setIsDFOpen={setIsDFOpen} />
       <Requests isROpen={isROpen} setIsROpen={setIsROpen} />
-      <main className="h-[calc(100vh-61px)] flex gap-4 pr-4">
-        <section className=" bg-[#975ba1] w-[50px] h-[calc(100vh-61px)] flex justify-center items-end">
+      <main className="h-fit small-laptop:h-[calc(100vh-66px)] medium-tablet:flex ">
+        <section className=" bg-[#975ba1] w-[50px]  small-laptop:h-[calc(100vh-68px)] hidden  small-laptop:flex justify-center items-end ">
           <ArrowLeftEndOnRectangleIcon
             className="w-7 h-7 text-white mb-4 cursor-pointer"
             onClick={signOut}
           />
         </section>
 
-        <section className=" w-[calc(100vw-50px)] mt-4 flex gap-6">
-          <div className="w-[20%]">
+        <section
+          className={`w-full small-laptop:w-[calc(100vw-50px)] small-laptop:mt-4 flex justify-center items-center ${
+            key ? "px-0  small-laptop:px-4" : "px-4"
+          }  gap-6 `}
+        >
+          <div
+            className={`w-full mt-4 small-laptop:mt-0 small-laptop:w-[40%] medium-laptop:w-[25%] ${
+              key ? "hidden small-laptop:block h-fit " : "block "
+            }`}
+          >
             <NewGroup isNGOpen={isNGOpen} setIsNGOpen={setIsNGOpen} />
-            <div className="bg-[#975ba1] pr-4 pl-4 pt-6 pb-6 rounded-lg">
+            <div className="bg-[#975ba1]  pr-4 pl-4 pt-6 pb-6 rounded-lg">
               <div className="flex items-end justify-between ">
                 <h1 className="text-white text-2xl font-normal">Chats</h1>
 
@@ -160,50 +216,58 @@ const Home: FC = () => {
                 />
               </div>
             </div>
-            <div className="mt-4 flex flex-col gap-4 h-[calc(100vh-225px)] overflow-y-scroll no-scrollbar">
-              <ChatCard search={search} />
+            <div className="mt-4 flex flex-col gap-4 h-[calc(100vh-250px)] overflow-y-scroll no-scrollbar">
+              <ChatCard key={key} setKey={setKey} search={search} />
             </div>
           </div>
           <div
             className={`bg-[#975ba1] ${
-              isRightBarOpen ? "w-[55%]" : "w-[80%]"
-            }  p-4 duration-500 ease rounded-lg`}
+              isRightBarOpen ? " hidden " : "w-[80%] small-laptop:block "
+            }  p-4 duration-500 ease medium-laptop:block  small-laptop:rounded-lg
+            ${key ? "block w-full h-screen small-laptop:h-[95%]" : "hidden "}
+            `}
           >
-            <nav className="flex items-center gap-x-12 justify-between  ">
-              {fDisplayName ? (
-                <div
-                  className="flex  gap-2 min-w-[10rem] cursor-pointer"
-                  onClick={() => setIsRightBarOpen(true)}
-                >
-                  <img
-                    src={chat_profile}
-                    alt="chat profile"
-                    className="w-[45px] h-[45px] rounded-[50%] object-cover"
-                  />
-                  <p className="text-white text-sm font-semibold">
-                    {fDisplayName && fDisplayName}
-                  </p>
-                </div>
-              ) : (
-                false
-              )}
-              {groupName ? (
-                <div
-                  className="flex  gap-2 min-w-[10rem] cursor-pointer"
-                  onClick={() => setIsRightBarOpen(true)}
-                >
-                  <img
-                    src={chat_profile}
-                    alt="chat profile"
-                    className="w-[45px] h-[45px] rounded-[50%] object-cover"
-                  />
-                  <p className="text-white text-sm font-semibold">
-                    {groupName && groupName}
-                  </p>
-                </div>
-              ) : (
-                false
-              )}
+            <nav className="flex items-center gap-x-12 justify-between mb-2 ">
+              <div className="flex items-center gap-6 ">
+                <ArrowLeftIcon
+                  className="w-6 h-6 small-laptop:hidden"
+                  onClick={() => setKey("")}
+                />
+                {fDisplayName ? (
+                  <div
+                    className="flex  gap-2 min-w-[10rem] cursor-pointer"
+                    onClick={() => setIsRightBarOpen(true)}
+                  >
+                    <img
+                      src={chat_profile}
+                      alt="chat profile"
+                      className="small-tablet:w-[45px] w-[35px] small-tablet:h-[45px]  h-[35px] rounded-[50%] object-cover"
+                    />
+                    <p className="text-white text-sm font-semibold">
+                      {fDisplayName && fDisplayName}
+                    </p>
+                  </div>
+                ) : (
+                  false
+                )}
+                {groupName ? (
+                  <div
+                    className="flex  gap-2 min-w-[10rem] cursor-pointer"
+                    onClick={() => setIsRightBarOpen(true)}
+                  >
+                    <img
+                      src={chat_profile}
+                      alt="chat profile"
+                      className="small-tablet:w-[45px] w-[30px] small-tablet:h-[45px]  h-[30px] rounded-[50%] object-cover"
+                    />
+                    <p className="text-white text-sm font-semibold">
+                      {groupName && groupName}
+                    </p>
+                  </div>
+                ) : (
+                  false
+                )}
+              </div>
 
               <div className=" bg-[#55254b] flex items-center max-w-[50%] pt-[0.125rem] pb-[0.125] pr-3 pl-3 rounded-2xl">
                 <MagnifyingGlassIcon className="w-[1.5rem] h-[1.5rem] text-white" />
@@ -213,15 +277,16 @@ const Home: FC = () => {
                 />
               </div>
             </nav>
+            <hr className="bg-[#55254b] border-none h-[1px]" />
             <Messages />
-            <section className="bg-[#55254b] p-4 rounded-xl flex items-center justify-evenly">
+            <section className="bg-[#55254b] p-4 gap-2 rounded-xl flex items-center justify-evenly">
               <PhotoIcon className="w-7 h-7 text-gray-200 cursor-pointer " />
               <SendMessage />
             </section>
           </div>
           <div
-            className={`bg-[#975ba1] w-[calc(100%-75%)] p-4 rounded-lg position: relative duration-[4s] ease-in-out ${
-              isRightBarOpen ? "block" : "hidden"
+            className={`bg-[#975ba1] medium-laptop:w-[calc(100%-75%)] p-4 small-laptop:rounded-lg small-laptop:h-[95%] relative duration-500 ease-in-out ${
+              isRightBarOpen ? "block w-full h-[100vh]  " : "hidden"
             } `}
           >
             <p className="text-[1.85rem] text-white text-center">
@@ -242,7 +307,7 @@ const Home: FC = () => {
                     {fDisplayName && fDisplayName}
                     {groupName && groupName}
                   </p>
-                  <p className=" text-gray-100">
+                  <p className="text-gray-100 ">
                     {fOccupation && fOccupation} {AdminName && AdminName}
                   </p>
                 </div>
@@ -258,11 +323,11 @@ const Home: FC = () => {
                     false
                   )}
                 </div>
-                <div>
+                <div className="max-w-[300px]">
                   <label className="text-gray-200">
                     {fDisplayName && "Email"} {groupName && "Admin Mail"}
                   </label>
-                  <p className="text-xl text-white">
+                  <p className="text-[1.125rem] whitespace-normal text-white max-w-[300px]">
                     {fEmail && fEmail} {AdminMail && AdminMail}
                   </p>
                 </div>
