@@ -195,6 +195,7 @@ const Requests: FC<Props> = ({ isROpen, setIsROpen }) => {
                     <div>
                       <img
                         src={chat_profile}
+                        loading="lazy"
                         alt="find friend's profile_picture"
                         className="w-[45px] h-[45px] rounded-[50%] object-cover"
                       />
@@ -251,6 +252,7 @@ const Requests: FC<Props> = ({ isROpen, setIsROpen }) => {
                   <div className="flex items-start gap-3">
                     <img
                       src={chat_profile}
+                      loading="lazy"
                       alt="find friend's profile_picture"
                       className="w-[45px] h-[45px] rounded-[50%] object-cover"
                     />

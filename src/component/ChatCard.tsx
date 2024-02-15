@@ -103,6 +103,7 @@ const ChatCard: FC<Props> = ({ search, key, setKey }) => {
                   <img
                     src={chat_profile}
                     alt="chat profile"
+                    loading="lazy"
                     className="w-[45px] h-[45px] rounded-[50%] object-cover"
                   />
                   <div>
@@ -138,6 +139,7 @@ const ChatCard: FC<Props> = ({ search, key, setKey }) => {
                   <img
                     src={chat_profile}
                     alt="chat profile"
+                    loading="lazy"
                     className="w-[45px] h-[45px] rounded-[50%] object-cover"
                   />
                   <div>

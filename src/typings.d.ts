@@ -115,6 +115,7 @@ type MessageInfo = {
   message: string;
   senderEmail: string | null;
   senderName: string | null;
+  image: string;
 };
 
 export {

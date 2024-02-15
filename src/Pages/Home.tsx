@@ -1,4 +1,4 @@
-import React, { FC, useState } from "react";
+import React, { FC, useEffect, useRef, useState } from "react";
 import profile_picture from "../assets/profile.jpg";
 import chat_profile from "../assets/chat_profile.jpg";
 import {
@@ -13,6 +13,7 @@ import {
   EllipsisVerticalIcon,
 } from "@heroicons/react/24/solid";
 import {
+  selectUid,
   selectDisplayName,
   selectOccupation,
   selectPhoneNumber,
@@ -52,11 +53,43 @@ const Home: FC = () => {
   const [isLogoutOpen, setIsLogoutOpen] = useState<boolean>(false);
   const [key, setKey] = useState<string>("");
   const [search, setSearch] = useState<string>("");
+  const [messageSearch, setMessageSearch] = useState<string>("");
+  const [imageViewer, setImageViewer] = useState<string>("");
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        event.target instanceof Node &&
+        !dropdownRef.current.contains(event.target)
+      ) {
+        setIsDFOpen(false);
+      }
+    };
+
+    if (isDFOpen) {
+      document.addEventListener("click", handleClickOutside);
+    } else {
+      document.removeEventListener("click", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("click", handleClickOutside);
+    };
+  }, [isDFOpen]);
+
+  const handleDropdownClick = (
+    event: React.MouseEvent<HTMLDivElement, MouseEvent>
+  ) => {
+    event.stopPropagation();
+  };
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   //* Current User info
+  const currentUserUid = useSelector(selectUid);
   const displayName = useSelector(selectDisplayName);
   const occupation = useSelector(selectOccupation);
   const phoneNumber = useSelector(selectPhoneNumber);
@@ -86,7 +119,7 @@ const Home: FC = () => {
   };
 
   return (
-    <div className="bg-[#55254b] h-screen">
+    <div className="bg-[#55254b] h-screen" ref={dropdownRef}>
       <nav
         className={`flex items-center justify-between bg-[#975ba1] pt-2 pb-2 pr-4 pl-4 ${
           key ? "hidden small-laptop:flex" : "block "
@@ -96,6 +129,7 @@ const Home: FC = () => {
           <img
             src={profile_picture}
             alt="profile picture"
+            loading="lazy"
             className="w-[45px] h-[45px] rounded-[50%] object-cover"
           />
           <div>
@@ -172,7 +206,11 @@ const Home: FC = () => {
       </nav>
       {!displayName || !occupation || !phoneNumber ? <Update /> : false}
 
-      <DiscoverConnections isDFOpen={isDFOpen} setIsDFOpen={setIsDFOpen} />
+      <DiscoverConnections
+        isDFOpen={isDFOpen}
+        setIsDFOpen={setIsDFOpen}
+        handleDropdownClick={handleDropdownClick}
+      />
       <Requests isROpen={isROpen} setIsROpen={setIsROpen} />
       <main className="h-fit small-laptop:h-[calc(100vh-66px)] medium-tablet:flex ">
         <section className=" bg-[#975ba1] w-[50px]  small-laptop:h-[calc(100vh-68px)] hidden  small-laptop:flex justify-center items-end ">
@@ -230,7 +268,7 @@ const Home: FC = () => {
             <nav className="flex items-center gap-x-12 justify-between mb-2 ">
               <div className="flex items-center gap-6 ">
                 <ArrowLeftIcon
-                  className="w-6 h-6 small-laptop:hidden"
+                  className="w-6 h-6 text-white small-laptop:hidden"
                   onClick={() => setKey("")}
                 />
                 {fDisplayName ? (
@@ -241,6 +279,7 @@ const Home: FC = () => {
                     <img
                       src={chat_profile}
                       alt="chat profile"
+                      loading="lazy"
                       className="small-tablet:w-[45px] w-[35px] small-tablet:h-[45px]  h-[35px] rounded-[50%] object-cover"
                     />
                     <p className="text-white text-sm font-semibold">
@@ -258,6 +297,7 @@ const Home: FC = () => {
                     <img
                       src={chat_profile}
                       alt="chat profile"
+                      loading="lazy"
                       className="small-tablet:w-[45px] w-[30px] small-tablet:h-[45px]  h-[30px] rounded-[50%] object-cover"
                     />
                     <p className="text-white text-sm font-semibold">
@@ -274,15 +314,17 @@ const Home: FC = () => {
                 <input
                   type="text"
                   className="bg-transparent outline-none w-full  pr-4 pl-4 text-lg text-white"
+                  value={messageSearch}
+                  onChange={(e) => setMessageSearch(e.target.value)}
                 />
               </div>
             </nav>
             <hr className="bg-[#55254b] border-none h-[1px]" />
-            <Messages />
-            <section className="bg-[#55254b] p-4 gap-2 rounded-xl flex items-center justify-evenly">
-              <PhotoIcon className="w-7 h-7 text-gray-200 cursor-pointer " />
-              <SendMessage />
-            </section>
+            <Messages
+              messageSearch={messageSearch}
+              setImageViewer={setImageViewer}
+            />
+            <SendMessage />
           </div>
           <div
             className={`bg-[#975ba1] medium-laptop:w-[calc(100%-75%)] p-4 small-laptop:rounded-lg small-laptop:h-[95%] relative duration-500 ease-in-out ${
@@ -300,6 +342,7 @@ const Home: FC = () => {
                 <img
                   src={chat_profile}
                   alt="chat profile"
+                  loading="lazy"
                   className="w-[75px] h-[75px] rounded-[50%] object-cover"
                 />
                 <div>
@@ -358,6 +401,21 @@ const Home: FC = () => {
           </div>
         </section>
       </main>
+      <div
+        className={` ${imageViewer ? "flex" : "hidden"} bg-[#3b3b3b] absolute 
+        top-0 left-0 h-screen  w-screen p-[2rem] flex items-center justify-center`}
+      >
+        <img
+          src={imageViewer}
+          alt=""
+          loading="lazy"
+          className="w-[95%] small-tablet:w-auto small-tablet:h-[95%] "
+        />
+        <XMarkIcon
+          onClick={() => setImageViewer("")}
+          className="absolute top-4 left-4 w-8 h-8 text-white"
+        />
+      </div>
     </div>
   );
 };

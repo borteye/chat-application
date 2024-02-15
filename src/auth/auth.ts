@@ -52,6 +52,7 @@ function NormalLoginAuth(
       }
     })
     .catch((error) => {
+      setNormalLoginLoading(false);
       console.log(error);
     });
 }
@@ -89,6 +90,7 @@ function GitHubLoginAuth(
       }
     })
     .catch((error) => {
+      setGitLoginLoading(false);
       console.log(error);
     });
 }
@@ -114,6 +116,7 @@ function NormalSignupAuth(
       navigate("/");
     })
     .catch((error: any) => {
+      setNormalSignupLoading(false);
       console.log(error);
     });
 }
@@ -137,6 +140,7 @@ function GitHubSignupAuth(
       navigate("/");
     })
     .catch((error) => {
+      setGitSignupLoading(false);
       // Handle Errors here.
       const errorCode = error.code;
       const errorMessage = error.message;

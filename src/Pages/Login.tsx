@@ -36,6 +36,7 @@ const Login: FC = () => {
       <img
         src={loginImage}
         alt="loginImage"
+        loading="lazy"
         className="w-6/12 h-screen object-cover hidden md:block"
       />
       <section className="w-full h-screen flex flex-col  justify-center bg-[#00000096] md:bg-[white] relative ">
@@ -110,15 +111,25 @@ const Login: FC = () => {
         {normalLoginLoading ? (
           <p className="absolute top-0 h-screen w-full flex justify-center items-center text-white bg-[#000000d7]">
             <div className="flex items-center text-[1.25rem] font-bold">
-              <img src={loading} alt="" className="w-[4rem] h-[4rem]" /> Logging
-              in
+              <img
+                src={loading}
+                loading="lazy"
+                alt=""
+                className="w-[4rem] h-[4rem]"
+              />{" "}
+              Logging in
             </div>
           </p>
         ) : gitLoginLoading ? (
           <p className="absolute top-0 h-screen w-full flex justify-center items-center text-white bg-[#000000d7]">
             <div className="flex items-center text-[1.25rem] font-bold">
-              <img src={loading} alt="" className="w-[4rem] h-[4rem]" /> Logging
-              in
+              <img
+                src={loading}
+                loading="lazy"
+                alt=""
+                className="w-[4rem] h-[4rem]"
+              />{" "}
+              Logging in
             </div>
           </p>
         ) : (

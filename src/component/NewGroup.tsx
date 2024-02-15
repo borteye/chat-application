@@ -252,6 +252,7 @@ const NewGroup: FC<Props> = ({ isNGOpen, setIsNGOpen }) => {
                       <img
                         src={chat_profile}
                         alt="chat profile"
+                        loading="lazy"
                         className="w-[45px] h-[45px] rounded-[50%] object-cover"
                       />
                       <div className="text-lg font-medium">

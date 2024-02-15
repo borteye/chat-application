@@ -223,14 +223,24 @@ const SignUp: FC = () => {
         {normalSignupLoading ? (
           <p className="absolute top-0 h-full w-full flex justify-center items-center text-white bg-[#000000d7]">
             <div className="flex items-center text-[1.25rem] font-bold">
-              <img src={loading} alt="" className="w-[4rem] h-[4rem]" />
+              <img
+                src={loading}
+                loading="lazy"
+                alt=""
+                className="w-[4rem] h-[4rem]"
+              />
               Creating account
             </div>
           </p>
         ) : gitSignupLoading ? (
           <p className="absolute top-0 h-full w-full flex justify-center items-center text-white bg-[#000000d7]">
             <div className="flex items-center text-[1.25rem] font-bold">
-              <img src={loading} alt="" className="w-[4rem] h-[4rem]" />
+              <img
+                src={loading}
+                loading="lazy"
+                alt=""
+                className="w-[4rem] h-[4rem]"
+              />
               Creating account
             </div>
           </p>
@@ -241,6 +251,7 @@ const SignUp: FC = () => {
       <img
         src={loginImage}
         alt="loginImage"
+        loading="lazy"
         className=" md:fixed md:top-0 md:right-0 w-6/12 h-full object-cover hidden md:block"
       />
     </div>

@@ -1,19 +1,14 @@
 import firebase from "firebase/compat/app";
 import db from "./firebaseConfig";
+import { storage } from "./firebaseConfig";
 import {
   BasicFriendInfo,
   BasicGroupInfo,
   BasicUserInfo,
+  MessageInfo,
   RequestInfo,
 } from "./typings";
-import { useSelector } from "react-redux";
-import {
-  selectDisplayName,
-  selectEmail,
-  selectOccupation,
-  selectPhoneNumber,
-  selectUid,
-} from "./features/userSlice";
+import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
 
 async function requestToJoinGroup(
   newConnections: BasicGroupInfo,
@@ -293,6 +288,147 @@ async function removeUserFromRequesterFriends(
     });
 }
 
+//*image upload start //
+
+//load selected file into variable
+const loadImage = (
+  file: File | undefined,
+  setImageURL: React.Dispatch<React.SetStateAction<string>>,
+  setProgress: React.Dispatch<React.SetStateAction<number | null>>
+) => {
+  if (!file) return;
+
+  const StorageRef = ref(storage, `/files/${file.name}`);
+
+  const uploadTask = uploadBytesResumable(StorageRef, file);
+  uploadTask.on(
+    "state_changed",
+    (snapshot) => {
+      // The loading  variable is the time it takes to upload the file to firebase from 0 to 100%. You can display it on front end.
+      const loading: number | null = Math.round(
+        (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+      );
+
+      // create a progress variable and set loading to it.
+      setProgress(loading);
+    },
+    (err) => console.log(err),
+    () => {
+      getDownloadURL(uploadTask.snapshot.ref).then((url) => {
+        //This is the file or image  url
+        setImageURL(url);
+      });
+    }
+  );
+};
+
+//*image upload finish //
+
+async function sendFriendChatMessage(
+  combinedUid: string | undefined,
+  currentUserEmail: string | null,
+  text: string,
+  setText: React.Dispatch<React.SetStateAction<string>>,
+  imageURL: string,
+  setImageURL: React.Dispatch<React.SetStateAction<string>>,
+  setProgress: React.Dispatch<React.SetStateAction<number | null>>
+) {
+  setText("");
+  setImageURL("");
+  setProgress(null);
+  const collectionRef = await db
+    .collection("conversations")
+    .doc(combinedUid)
+    .collection("messages");
+  //* Generate an auto-generated UID
+  const uid = collectionRef.doc().id;
+  await collectionRef.doc(uid).set(
+    {
+      senderEmail: currentUserEmail,
+      id: uid,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      message: text,
+      image: imageURL,
+    },
+    { merge: true }
+  );
+}
+
+async function sendGroupChatMessage(
+  groupUid: string | undefined,
+  currentUserEmail: string | null,
+  currentUserDisplayName: string | null,
+  text: string,
+  setText: React.Dispatch<React.SetStateAction<string>>,
+  imageURL: string,
+  setImageURL: React.Dispatch<React.SetStateAction<string>>,
+  setProgress: React.Dispatch<React.SetStateAction<number | null>>
+) {
+  setText("");
+  setImageURL("");
+  setProgress(null);
+  const collectionRef = await db
+    .collection("conversations")
+    .doc(groupUid)
+    .collection("messages");
+  //* Generate an auto-generated UID
+
+  const uid = collectionRef.doc().id;
+  await collectionRef.doc(uid).set(
+    {
+      senderEmail: currentUserEmail,
+      senderName: currentUserDisplayName,
+      id: uid,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      message: text,
+      image: imageURL,
+    },
+    { merge: true }
+  );
+}
+
+function dateConverter(date: string) {
+  const dateString = date;
+  const dateObject = new Date(dateString);
+  const formattedDate = `${dateObject.getDate()}/${
+    dateObject.getMonth() + 1
+  }/${dateObject.getFullYear()}`;
+  console.log(formattedDate);
+
+  return formattedDate;
+}
+
+const groupMessagesByDate = (
+  conversation: MessageInfo[] | undefined
+): { date: string; messages: MessageInfo[] }[] => {
+  if (!conversation) return [];
+
+  const groupedMessages = conversation.reduce(
+    (
+      previousValue: { date: string; messages: MessageInfo[] }[],
+      currentValue: MessageInfo
+    ) => {
+      const date: string = dateConverter(currentValue?.createdAt?.toDate());
+      const existingDateIndex = previousValue.findIndex(
+        (item) => item?.date === date
+      );
+
+      if (existingDateIndex !== -1) {
+        previousValue[existingDateIndex].messages.push(currentValue);
+      } else {
+        previousValue.push({ date: date, messages: [currentValue] });
+      }
+
+      return previousValue;
+    },
+    [] as { date: string; messages: MessageInfo[] }[]
+  );
+
+  return groupedMessages;
+};
+
+console.log(groupMessagesByDate);
+
 export {
   requestToJoinGroup,
   sendFriendRequest,
@@ -306,4 +442,9 @@ export {
   removeRequesterFromGroupParticipants,
   removeRequesterFromUserFriends,
   removeUserFromRequesterFriends,
+  sendFriendChatMessage,
+  sendGroupChatMessage,
+  loadImage,
+  dateConverter,
+  groupMessagesByDate,
 };

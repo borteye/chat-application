@@ -32,9 +32,16 @@ import {
 interface Props {
   isDFOpen: boolean;
   setIsDFOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  handleDropdownClick: (
+    event: React.MouseEvent<HTMLDivElement, MouseEvent>
+  ) => void;
 }
 
-const DiscoverConnections: FC<Props> = ({ isDFOpen, setIsDFOpen }) => {
+const DiscoverConnections: FC<Props> = ({
+  isDFOpen,
+  setIsDFOpen,
+  handleDropdownClick,
+}) => {
   const [search, setSearch] = useState<string>("");
 
   const dispatch = useDispatch();
@@ -179,6 +186,7 @@ const DiscoverConnections: FC<Props> = ({ isDFOpen, setIsDFOpen }) => {
       className={` ${
         !isDFOpen ? "hidden" : false
       }  mx-2 w-[95vw] small-laptop:w-[22rem] small-laptop:right-10 bg-[#55254b] text-white position: absolute  z-50 shadow-[0_3px_10px_rgb(0,0,0,0.2)]`}
+      onClick={handleDropdownClick}
     >
       <div className="bg-[#975ba1] p-4 flex flex-col gap-2">
         <div className="flex items-center gap-16">
@@ -227,6 +235,7 @@ const DiscoverConnections: FC<Props> = ({ isDFOpen, setIsDFOpen }) => {
                         <img
                           src={chat_profile}
                           alt="find friend's profile_picture"
+                          loading="lazy"
                           className="w-[45px] h-[45px] rounded-[50%] object-cover"
                         />
                         <p className="text-gray-300 text-sm">group</p>
@@ -277,6 +286,7 @@ const DiscoverConnections: FC<Props> = ({ isDFOpen, setIsDFOpen }) => {
                       <img
                         src={chat_profile}
                         alt="find friend's profile_picture"
+                        loading="lazy"
                         className="w-[45px] h-[45px] rounded-[50%] object-cover"
                       />
                       <p>{(newConnections as BasicFriendInfo)?.displayName}</p>
