@@ -21,8 +21,6 @@ const Update: FC = () => {
 
   //* Current User info
   const userUid = useSelector(selectUid);
-
-  console.log(userDisplayName);
   const userOccupation = useSelector(selectOccupation);
   const userPhoneNumber = useSelector(selectPhoneNumber);
   const userEmail = useSelector(selectEmail);

@@ -5,6 +5,7 @@ import { selectGroupUid } from "../features/groupSlice";
 import { selectCombinedUid } from "../features/friendSlice";
 import firebase from "firebase/compat/app";
 import db from "../firebaseConfig";
+import chat_profile from "../assets/chat_profile.jpg";
 import { selectDisplayName, selectEmail } from "../features/userSlice";
 import {
   loadImage,
@@ -17,10 +18,24 @@ import CircularProgress, {
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 
-const SendMessage: FC = () => {
+interface Props {
+  imagePreview: string;
+  setImagePreview: React.Dispatch<React.SetStateAction<string>>;
+  imageURL: string;
+  setImageURL: React.Dispatch<React.SetStateAction<string>>;
+  setProgress: React.Dispatch<React.SetStateAction<number | null>>;
+  progress: number | null;
+}
+
+const SendMessage: FC<Props> = ({
+  imagePreview,
+  setImagePreview,
+  imageURL,
+  setImageURL,
+  setProgress,
+  progress,
+}) => {
   const [text, setText] = useState<string>("");
-  const [imageURL, setImageURL] = useState<string>("");
-  const [progress, setProgress] = useState<number | null>(null);
 
   //* currentUser info
   const currentUserEmail = useSelector(selectEmail);
@@ -36,8 +51,14 @@ const SendMessage: FC = () => {
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
 
-    const file: File | undefined = e.target.files?.[0];
-    loadImage(file, setImageURL, setProgress);
+    const file = e.target.files?.[0];
+    console.log(file);
+
+    if (file) {
+      setImagePreview(URL.createObjectURL(file));
+    }
+    console.log(imagePreview);
+    loadImage(file, setImageURL, setProgress, imagePreview);
   };
 
   const handleSendMessage: React.FormEventHandler<HTMLFormElement> = async (
@@ -114,7 +135,11 @@ const SendMessage: FC = () => {
           <PhotoIcon className="w-7 h-7 text-gray-200 cursor-pointer " />
         </label>
       </div>
-      {progress && <CircularProgressWithLabel value={progress} />}
+      {imageURL && progress ? (
+        <CircularProgressWithLabel value={progress} />
+      ) : (
+        false
+      )}
 
       <form
         onSubmit={handleSendMessage}

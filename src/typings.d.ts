@@ -118,6 +118,32 @@ type MessageInfo = {
   image: string;
 };
 
+interface EditMessageDetails {
+  editMessage: {
+    id: string | undefined;
+    message: string;
+    chatId: string | undefined;
+    image: string | null;
+    senderEmail: string | null;
+    createdAt: firebase.firestore.Timestamp | null;
+  };
+}
+
+type EditMessageInfo = {
+  id: string | undefined;
+  message: string;
+  chatId: string | undefined;
+};
+
+interface ToggleDetails {
+  toggles: {
+    connectionsToggle: boolean;
+    requestsToggle: boolean;
+    editMessageToggle: boolean;
+    isChatSelected: boolean;
+  };
+}
+
 export {
   UserDetails,
   BasicUserInfo,
@@ -132,4 +158,7 @@ export {
   NewGroup,
   MessageInfo,
   AcceptRequestInfo,
+  EditMessageDetails,
+  EditMessageInfo,
+  ToggleDetails,
 };

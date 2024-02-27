@@ -11,6 +11,8 @@ import {
   UsersIcon,
   XMarkIcon,
   EllipsisVerticalIcon,
+  PaperAirplaneIcon,
+  CheckIcon,
 } from "@heroicons/react/24/solid";
 import {
   selectUid,
@@ -18,19 +20,20 @@ import {
   selectOccupation,
   selectPhoneNumber,
   setUserLogoutState,
+  selectEmail,
 } from "../features/userSlice";
 import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import {
   setNonActiveFriend,
   selectFDisplayName,
-  selectEmail,
   selectFOccupation,
   selectFriendSince,
   selectFPhoneNumber,
+  selectCombinedUid,
 } from "../features/friendSlice";
 import ChatCard from "../component/ChatCard";
-import { auth } from "../firebaseConfig";
+import db, { auth } from "../firebaseConfig";
 import DiscoverConnections from "../component/DiscoverConnections";
 import Requests from "../component/Requests";
 import NewGroup from "../component/NewGroup";
@@ -39,57 +42,45 @@ import {
   selectAdminName,
   selectGroupCreatedAt,
   selectGroupName,
+  selectGroupUid,
 } from "../features/groupSlice";
 import SendMessage from "../component/SendMessage";
 import Messages from "../component/Messages";
 import { requestLength } from "../features/requestsSlice";
 import Update from "../component/Update";
+import {
+  selectChatId,
+  selectMessage,
+  selectMessageId,
+  setDoneEditing,
+} from "../features/editMessageSlice";
+import loginImage from "../assets/loginImage.jpg";
+import { sendFriendChatMessage } from "../utils";
+import { editMessageToggle, isVisible } from "../features/togglesSlice";
+import FriendMessages from "../component/FriendMessages";
 
 const Home: FC = () => {
   const [isRightBarOpen, setIsRightBarOpen] = useState<boolean>(false);
-  const [isDFOpen, setIsDFOpen] = useState<boolean>(false);
-  const [isROpen, setIsROpen] = useState<boolean>(false);
   const [isNGOpen, setIsNGOpen] = useState<boolean>(false);
   const [isLogoutOpen, setIsLogoutOpen] = useState<boolean>(false);
-  const [key, setKey] = useState<string>("");
   const [search, setSearch] = useState<string>("");
   const [messageSearch, setMessageSearch] = useState<string>("");
   const [imageViewer, setImageViewer] = useState<string>("");
-  const dropdownRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        dropdownRef.current &&
-        event.target instanceof Node &&
-        !dropdownRef.current.contains(event.target)
-      ) {
-        setIsDFOpen(false);
-      }
-    };
-
-    if (isDFOpen) {
-      document.addEventListener("click", handleClickOutside);
-    } else {
-      document.removeEventListener("click", handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener("click", handleClickOutside);
-    };
-  }, [isDFOpen]);
-
-  const handleDropdownClick = (
-    event: React.MouseEvent<HTMLDivElement, MouseEvent>
-  ) => {
-    event.stopPropagation();
-  };
+  const [chatSelected, setChatSelected] = useState(false);
+  const [editMessage, setEditMessage] = useState<string>("");
+  const [imageURL, setImageURL] = useState<string>("");
+  const [imagePreview, setImagePreview] = useState<string>("");
+  const [progress, setProgress] = useState<number | null>(null);
+  const [text, setText] = useState<string>("");
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  //* toggles
+  const editMsg = useSelector(editMessageToggle);
+
   //* Current User info
-  const currentUserUid = useSelector(selectUid);
+  const currentUserEmail = useSelector(selectEmail);
   const displayName = useSelector(selectDisplayName);
   const occupation = useSelector(selectOccupation);
   const phoneNumber = useSelector(selectPhoneNumber);
@@ -100,15 +91,63 @@ const Home: FC = () => {
   const fOccupation = useSelector(selectFOccupation);
   const friendSince = useSelector(selectFriendSince);
   const fPhoneNumber = useSelector(selectFPhoneNumber);
+  const combinedUid = useSelector(selectCombinedUid);
 
   //* Group info
   const groupName = useSelector(selectGroupName);
   const AdminName = useSelector(selectAdminName);
   const AdminMail = useSelector(selectAdminMail);
   const groupCreatedAt = useSelector(selectGroupCreatedAt);
+  const groupUid = useSelector(selectGroupUid);
 
   //* Total Requests
   const totalRequests = useSelector(requestLength);
+
+  //* Edit Message Details
+  const messageId = useSelector(selectMessageId);
+  const message = useSelector(selectMessage);
+  const chatId = useSelector(selectChatId);
+
+  //* handle Edit function
+  const handleEditMessage: React.FormEventHandler<HTMLFormElement> = (e) => {
+    e.preventDefault();
+    if (chatId === combinedUid) {
+      db.collection("conversations")
+        .doc(chatId)
+        .collection("messages")
+        .doc(messageId)
+        .set(
+          {
+            message: editMessage,
+          },
+          { merge: true }
+        );
+    }
+    dispatch(
+      isVisible({
+        editMessageToggle: false,
+      })
+    );
+  };
+
+  console.log(imageURL);
+
+  //* send message function
+  const sendMessage: React.FormEventHandler<HTMLFormElement> = (e) => {
+    e.preventDefault();
+    if (combinedUid) {
+      sendFriendChatMessage(
+        combinedUid,
+        currentUserEmail,
+        text,
+        setText,
+        imageURL,
+        setImageURL,
+        setProgress
+      );
+      setImagePreview("");
+    }
+  };
 
   //* Sign user out of session
   const signOut = async () => {
@@ -119,10 +158,10 @@ const Home: FC = () => {
   };
 
   return (
-    <div className="bg-[#55254b] h-screen" ref={dropdownRef}>
+    <div className="bg-[#55254b] h-screen overflow-y-hidden no-scrollbar">
       <nav
         className={`flex items-center justify-between bg-[#975ba1] pt-2 pb-2 pr-4 pl-4 ${
-          key ? "hidden small-laptop:flex" : "block "
+          chatSelected ? "hidden small-laptop:flex" : "block "
         }`}
       >
         <div className="gap-3 hidden medium-tablet:flex ">
@@ -145,9 +184,12 @@ const Home: FC = () => {
         <div className="flex items-center small-tablet:gap-x-6 gap-x-5 py-3 text-gray-200">
           <div
             onClick={() => {
-              setIsDFOpen(true);
-              setIsROpen(false);
-              setIsLogoutOpen(false);
+              dispatch(
+                isVisible({
+                  connectionsToggle: true,
+                  requetsToggle: false,
+                })
+              );
             }}
             className="small-tablet:hidden flex items-center justify-center gap-1 cursor-pointer bg-[#55254b] pt-[1.5px] pb-[1.5px] pr-4 pl-4 rounded-2xl text-sm"
           >
@@ -155,9 +197,12 @@ const Home: FC = () => {
           </div>
           <div
             onClick={() => {
-              setIsDFOpen(true);
-              setIsROpen(false);
-              setIsLogoutOpen(false);
+              dispatch(
+                isVisible({
+                  connectionsToggle: true,
+                  requetsToggle: false,
+                })
+              );
             }}
             className="small-tablet:flex hidden items-center justify-center gap-1 cursor-pointer bg-[#55254b] pt-[1.5px] pb-[1.5px] pr-4 pl-4 rounded-2xl"
           >
@@ -165,9 +210,12 @@ const Home: FC = () => {
           </div>
           <div
             onClick={() => {
-              setIsROpen(true);
-              setIsDFOpen(false);
-              setIsLogoutOpen(false);
+              dispatch(
+                isVisible({
+                  requestsToggle: true,
+                  connectionsToggle: false,
+                })
+              );
             }}
             className="flex items-center mr-8 small-laptop:mr-0 justify-center gap-1 cursor-pointer bg-[#55254b] py-[1.5px] px-4 rounded-2xl text-sm small-tablet:text-base"
           >
@@ -186,8 +234,6 @@ const Home: FC = () => {
                 className="w-6 h-6 small-tablet:w-8 small-tablet:h-8"
                 onClick={() => {
                   setIsLogoutOpen(true);
-                  setIsDFOpen(false);
-                  setIsROpen(false);
                 }}
               />
             )}
@@ -206,12 +252,8 @@ const Home: FC = () => {
       </nav>
       {!displayName || !occupation || !phoneNumber ? <Update /> : false}
 
-      <DiscoverConnections
-        isDFOpen={isDFOpen}
-        setIsDFOpen={setIsDFOpen}
-        handleDropdownClick={handleDropdownClick}
-      />
-      <Requests isROpen={isROpen} setIsROpen={setIsROpen} />
+      <DiscoverConnections />
+      <Requests />
       <main className="h-fit small-laptop:h-[calc(100vh-66px)] medium-tablet:flex ">
         <section className=" bg-[#975ba1] w-[50px]  small-laptop:h-[calc(100vh-68px)] hidden  small-laptop:flex justify-center items-end ">
           <ArrowLeftEndOnRectangleIcon
@@ -222,12 +264,12 @@ const Home: FC = () => {
 
         <section
           className={`w-full small-laptop:w-[calc(100vw-50px)] small-laptop:mt-4 flex justify-center items-center ${
-            key ? "px-0  small-laptop:px-4" : "px-4"
+            chatSelected ? "px-0  small-laptop:px-4" : "px-4"
           }  gap-6 `}
         >
           <div
             className={`w-full mt-4 small-laptop:mt-0 small-laptop:w-[40%] medium-laptop:w-[25%] ${
-              key ? "hidden small-laptop:block h-fit " : "block "
+              chatSelected ? "hidden small-laptop:block h-fit " : "block "
             }`}
           >
             <NewGroup isNGOpen={isNGOpen} setIsNGOpen={setIsNGOpen} />
@@ -255,21 +297,27 @@ const Home: FC = () => {
               </div>
             </div>
             <div className="mt-4 flex flex-col gap-4 h-[calc(100vh-250px)] overflow-y-scroll no-scrollbar">
-              <ChatCard key={key} setKey={setKey} search={search} />
+              <ChatCard search={search} setChatSelected={setChatSelected} />
             </div>
           </div>
           <div
             className={`bg-[#975ba1] ${
+              (editMsg && "relative ") || (imagePreview && "relative")
+            } ${
               isRightBarOpen ? " hidden " : "w-[80%] small-laptop:block "
             }  p-4 duration-500 ease medium-laptop:block  small-laptop:rounded-lg
-            ${key ? "block w-full h-screen small-laptop:h-[95%]" : "hidden "}
+            ${
+              chatSelected
+                ? "block w-full h-screen small-laptop:h-[95%]"
+                : "hidden "
+            }
             `}
           >
             <nav className="flex items-center gap-x-12 justify-between mb-2 ">
               <div className="flex items-center gap-6 ">
                 <ArrowLeftIcon
                   className="w-6 h-6 text-white small-laptop:hidden"
-                  onClick={() => setKey("")}
+                  onClick={() => setChatSelected(false)}
                 />
                 {fDisplayName ? (
                   <div
@@ -320,11 +368,121 @@ const Home: FC = () => {
               </div>
             </nav>
             <hr className="bg-[#55254b] border-none h-[1px]" />
-            <Messages
-              messageSearch={messageSearch}
-              setImageViewer={setImageViewer}
-            />
-            <SendMessage />
+            <div className=" w-ful small-laptop:h-[calc(100vh-270px)] h-[calc(100vh-(150px+1rem))] flex flex-col gap-12 overflow-y-scroll  no-scrollbar ">
+              {combinedUid ? (
+                <FriendMessages
+                  messageSearch={messageSearch}
+                  setEditMessage={setEditMessage}
+                  setImageViewer={setImageViewer}
+                />
+              ) : (
+                false
+              )}
+            </div>
+
+            {!editMsg && (
+              <SendMessage
+                imagePreview={imagePreview}
+                setImagePreview={setImagePreview}
+                imageURL={imageURL}
+                setImageURL={setImageURL}
+                setProgress={setProgress}
+                progress={progress}
+              />
+            )}
+
+            {/* ---------- Image Preview Start ----------- */}
+
+            <div
+              className={`absolute ${
+                imagePreview ? "flex" : "hidden"
+              } top-0 left-0 flex-col justify-between gap-2  bg-black p-3 h-full w-full`}
+            >
+              <p
+                onClick={() => {
+                  setImageURL("");
+                  setProgress(null);
+                  setImagePreview("");
+                }}
+                className="bg-[#2c2b2b] rounded-[50%] w-fit p-2 cursor-pointer"
+              >
+                <XMarkIcon className="w-6 h-6 text-white " />
+              </p>
+
+              <div className="flex justify-center h-[65vh] w-full">
+                <img
+                  src={imagePreview}
+                  alt=""
+                  className="w-fit object-contain"
+                />
+              </div>
+
+              <form
+                onSubmit={sendMessage}
+                className="flex flex-col small-laptop:flex-row small-laptop:items-center items-end  px-2 gap-4 w-full"
+              >
+                <input
+                  type="text"
+                  value={text}
+                  onChange={(e) => setText(e.target.value)}
+                  placeholder="Add a caption..."
+                  className="bg-[#975ba1] normal-text italic-placeholder w-full px-4 py-2 rounded-3xl outline-none text-white "
+                />
+                <button
+                  type="submit"
+                  className=" bg-[#55254b] border-none rounded-[50%] p-2"
+                >
+                  <PaperAirplaneIcon className="w-7 h-7 font-bold text-white cursor-pointer " />
+                </button>
+              </form>
+            </div>
+
+            {/* ---------- Image Preview End ---------- */}
+
+            {/* ----------- Edit Message Start ----------- */}
+            <div
+              className={` ${
+                editMsg ? "flex" : "hidden"
+              } editMessage flex flex-col  justify-between bg-[#0000009c] absolute top-0 left-0 rounded-lg h-full w-full`}
+            >
+              <p className="text-white flex items-center gap-2 bg-black rounded-lg py-5 px-2 text-xl">
+                <ArrowLeftIcon
+                  onClick={() => {
+                    dispatch(
+                      isVisible({
+                        editMessageToggle: false,
+                      })
+                    );
+                    dispatch(setDoneEditing());
+                  }}
+                  className="w-6 h-6 cursor-pointer"
+                />
+                Edit Message
+              </p>
+              <div className="flex flex-col gap-2 justify-end items-end">
+                <p className=" bg-[#f9b142] text-white py-1 mr-1 px-2 text-left font-medium  rounded-s-md ">
+                  {message && message}
+                </p>
+                <form
+                  onSubmit={handleEditMessage}
+                  className="flex items-center mb-8 px-2 gap-4 w-full"
+                >
+                  <input
+                    type="text"
+                    value={editMessage}
+                    onChange={(e) => setEditMessage(e.target.value)}
+                    className="bg-[#975ba1] normal-text italic-placeholder w-full px-4 py-2 rounded-3xl outline-none text-white "
+                  />
+                  <button
+                    type="submit"
+                    className=" bg-black border-none rounded-[50%] p-2"
+                  >
+                    <CheckIcon className="w-7 h-7 font-bold text-white cursor-pointer " />
+                  </button>
+                </form>
+              </div>
+            </div>
+            {/* ----------- Edit Message End ----------- */}
           </div>
           <div
             className={`bg-[#975ba1] medium-laptop:w-[calc(100%-75%)] p-4 small-laptop:rounded-lg small-laptop:h-[95%] relative duration-500 ease-in-out ${

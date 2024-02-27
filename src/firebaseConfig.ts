@@ -5,12 +5,12 @@ import { getStorage, ref } from "firebase/storage";
 import { getAuth } from "firebase/auth";
 
 const firebaseConfig = firebase.initializeApp({
-    apiKey: "AIzaSyAnGHTPP8cC4wq0EmSBEbVAJT54pNZE1ls",
-  authDomain: "next-app-6696a.firebaseapp.com",
-  projectId: "next-app-6696a",
-  storageBucket: "next-app-6696a.appspot.com",
-  messagingSenderId: "282848710585",
-  appId: "1:282848710585:web:890c70eb39689b513ef068"
+  apiKey: "AIzaSyCVTGMja57-HGINEyDSJ80W5I7KOKacljI",
+  authDomain: "crud-89eaa.firebaseapp.com",
+  projectId: "crud-89eaa",
+  storageBucket: "crud-89eaa.appspot.com",
+  messagingSenderId: "917738414210",
+  appId: "1:917738414210:web:8c598c25fd9ee3c48fd49b",
 });
 
 const db = firebaseConfig.firestore();
@@ -18,4 +18,4 @@ const auth = getAuth(firebaseConfig);
 const storage = getStorage(firebaseConfig);
 
 export default db;
-export { auth, storage};
+export { auth, storage };

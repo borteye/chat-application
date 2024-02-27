@@ -7,16 +7,16 @@ import db from "../firebaseConfig";
 import { ChatInfo } from "../typings";
 import { setActiveGroup, setNonActiveGroup } from "../features/groupSlice";
 import { useDocument } from "react-firebase-hooks/firestore";
+import { isVisible } from "../features/togglesSlice";
 
 interface Props {
-  key: string | undefined;
-  setKey: React.Dispatch<React.SetStateAction<string>>;
   search: string;
+  setChatSelected: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const ChatCard: FC<Props> = ({ search, key, setKey }) => {
+const ChatCard: FC<Props> = ({ search, setChatSelected }) => {
+  const [key, setKey] = useState<string>("");
   const dispatch = useDispatch();
-  console.log(key);
 
   //* current user uid
   const currentUserUid = useSelector(selectUid);
@@ -35,6 +35,7 @@ const ChatCard: FC<Props> = ({ search, key, setKey }) => {
           adminMail: chat?.adminMail,
         })
       );
+      setChatSelected(true);
     } else if (chat?.displayName) {
       if (currentUserUid && chat?.uid) {
         const combinedUid =
@@ -53,6 +54,7 @@ const ChatCard: FC<Props> = ({ search, key, setKey }) => {
             combinedUid: combinedUid,
           })
         );
+        setChatSelected(true);
       }
     }
   };
@@ -83,7 +85,6 @@ const ChatCard: FC<Props> = ({ search, key, setKey }) => {
           }
         })
         ?.map((chat) => {
-          console.log(chat);
           if (chat?.adminName) {
             return (
               <div
@@ -93,7 +94,6 @@ const ChatCard: FC<Props> = ({ search, key, setKey }) => {
                 key={chat?.uid}
                 onClick={() => {
                   if (chat.uid !== undefined) {
-                    console.log(chat?.uid);
                     setKey(chat?.uid);
                   }
                   selectChat(chat);

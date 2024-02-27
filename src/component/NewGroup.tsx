@@ -160,9 +160,12 @@ const NewGroup: FC<Props> = ({ isNGOpen, setIsNGOpen }) => {
       <div className="px-6 mb-4">
         <div className="border border-black  border-bottom mb-4">
           <div className="flex flex-wrap items-center gap-2 ">
-            {newGroup?.map((person: BasicFriendInfo) => {
+            {newGroup?.map((person: BasicFriendInfo, i) => {
               return (
-                <div className="bg-[#975ba1] px-4 py-1 text-white w-fit">
+                <div
+                  className="bg-[#975ba1] px-4 py-1 text-white w-fit"
+                  key={i}
+                >
                   {person?.displayName}
                 </div>
               );
@@ -242,12 +245,15 @@ const NewGroup: FC<Props> = ({ isNGOpen, setIsNGOpen }) => {
                   return val;
                 }
               })
-              ?.map((friend) => {
+              ?.map((friend, i) => {
                 const exist = newGroup?.find(
                   (user: BasicFriendInfo) => user?.uid === friend?.uid
                 );
                 return (
-                  <div className="flex  items-center justify-between small-laptop:gap-[2rem] px-6 py-4 hover:bg-[#f9b142]">
+                  <div
+                    key={i}
+                    className="flex  items-center justify-between small-laptop:gap-[2rem] px-6 py-4 hover:bg-[#f9b142]"
+                  >
                     <div className="flex items-center gap-5">
                       <img
                         src={chat_profile}

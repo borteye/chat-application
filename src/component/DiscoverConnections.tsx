@@ -28,23 +28,15 @@ import {
   undoFriendRequest,
   undoGroupRequest,
 } from "../utils";
+import { connectionsToggle, isVisible } from "../features/togglesSlice";
 
-interface Props {
-  isDFOpen: boolean;
-  setIsDFOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  handleDropdownClick: (
-    event: React.MouseEvent<HTMLDivElement, MouseEvent>
-  ) => void;
-}
-
-const DiscoverConnections: FC<Props> = ({
-  isDFOpen,
-  setIsDFOpen,
-  handleDropdownClick,
-}) => {
+const DiscoverConnections: FC = () => {
   const [search, setSearch] = useState<string>("");
 
   const dispatch = useDispatch();
+
+  //* toggle
+  const dcToggle = useSelector(connectionsToggle);
 
   //* current user's info
   const currentUserUid = useSelector(selectUid);
@@ -98,7 +90,6 @@ const DiscoverConnections: FC<Props> = ({
       .collection("users")
       .where(firebase.firestore.FieldPath.documentId(), "!=", currentUserUid);
     groupsRef = db.collection("groups");
-    console.log(groupsRef);
   }
 
   //* unrelated users
@@ -184,13 +175,21 @@ const DiscoverConnections: FC<Props> = ({
   return (
     <div
       className={` ${
-        !isDFOpen ? "hidden" : false
+        !dcToggle ? "hidden" : false
       }  mx-2 w-[95vw] small-laptop:w-[22rem] small-laptop:right-10 bg-[#55254b] text-white position: absolute  z-50 shadow-[0_3px_10px_rgb(0,0,0,0.2)]`}
-      onClick={handleDropdownClick}
     >
       <div className="bg-[#975ba1] p-4 flex flex-col gap-2">
         <div className="flex items-center gap-16">
-          <p className="cursor-pointer" onClick={() => setIsDFOpen(false)}>
+          <p
+            className="cursor-pointer"
+            onClick={() =>
+              dispatch(
+                isVisible({
+                  connectionsToggle: false,
+                })
+              )
+            }
+          >
             Close
           </p>
           <h1 className="text-xl">Connections</h1>

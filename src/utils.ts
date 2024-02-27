@@ -294,7 +294,8 @@ async function removeUserFromRequesterFriends(
 const loadImage = (
   file: File | undefined,
   setImageURL: React.Dispatch<React.SetStateAction<string>>,
-  setProgress: React.Dispatch<React.SetStateAction<number | null>>
+  setProgress: React.Dispatch<React.SetStateAction<number | null>>,
+  imagePreview: string
 ) => {
   if (!file) return;
 
@@ -316,6 +317,7 @@ const loadImage = (
     () => {
       getDownloadURL(uploadTask.snapshot.ref).then((url) => {
         //This is the file or image  url
+
         setImageURL(url);
       });
     }
@@ -333,6 +335,7 @@ async function sendFriendChatMessage(
   setImageURL: React.Dispatch<React.SetStateAction<string>>,
   setProgress: React.Dispatch<React.SetStateAction<number | null>>
 ) {
+  console.log(imageURL);
   setText("");
   setImageURL("");
   setProgress(null);
@@ -387,13 +390,12 @@ async function sendGroupChatMessage(
   );
 }
 
-function dateConverter(date: string) {
+function dateFormatter(date: Date) {
   const dateString = date;
   const dateObject = new Date(dateString);
   const formattedDate = `${dateObject.getDate()}/${
     dateObject.getMonth() + 1
   }/${dateObject.getFullYear()}`;
-  console.log(formattedDate);
 
   return formattedDate;
 }
@@ -408,7 +410,7 @@ const groupMessagesByDate = (
       previousValue: { date: string; messages: MessageInfo[] }[],
       currentValue: MessageInfo
     ) => {
-      const date: string = dateConverter(currentValue?.createdAt?.toDate());
+      const date: string = dateFormatter(currentValue?.createdAt?.toDate());
       const existingDateIndex = previousValue.findIndex(
         (item) => item?.date === date
       );
@@ -427,8 +429,6 @@ const groupMessagesByDate = (
   return groupedMessages;
 };
 
-console.log(groupMessagesByDate);
-
 export {
   requestToJoinGroup,
   sendFriendRequest,
@@ -445,6 +445,6 @@ export {
   sendFriendChatMessage,
   sendGroupChatMessage,
   loadImage,
-  dateConverter,
+  dateFormatter,
   groupMessagesByDate,
 };

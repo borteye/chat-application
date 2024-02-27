@@ -1,13 +1,23 @@
 import { configureStore, combineReducers } from "@reduxjs/toolkit";
-import { persistStore, persistReducer, FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER } from "redux-persist";
+import {
+  persistStore,
+  persistReducer,
+  FLUSH,
+  REHYDRATE,
+  PAUSE,
+  PERSIST,
+  PURGE,
+  REGISTER,
+} from "redux-persist";
 import storage from "redux-persist/lib/storage";
 import userReducer from "./features/userSlice";
 import friendReducer from "./features/friendSlice";
 import discoverConnectionsReducer from "./features/discoverConnectionsInfoSlice";
 import requestsReducer from "./features/requestsSlice";
 import groupReducer from "./features/groupSlice";
-import newgroupReducer from "./features/newGroupSlice"
-
+import newgroupReducer from "./features/newGroupSlice";
+import editMessageReducer from "./features/editMessageSlice";
+import togglesReducer from "./features/togglesSlice";
 
 //* Combine your reducers
 const rootReducer = combineReducers({
@@ -16,7 +26,9 @@ const rootReducer = combineReducers({
   discoverConnections: discoverConnectionsReducer,
   requests: requestsReducer,
   group: groupReducer,
-  newgroup: newgroupReducer
+  newgroup: newgroupReducer,
+  editMessage: editMessageReducer,
+  toggles: togglesReducer,
 });
 
 //* Define persist config
@@ -32,7 +44,7 @@ const persistedReducer = persistReducer(persistConfig, rootReducer);
 //* Configure the store
 export const store = configureStore({
   reducer: persistedReducer,
-    middleware: (getDefaultMiddleware) =>
+  middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: {
         ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
@@ -42,5 +54,3 @@ export const store = configureStore({
 
 //* Create the persistor
 export const persistor = persistStore(store);
-
-

@@ -30,17 +30,16 @@ import {
   removeRequesterFromUserFriends,
   removeUserFromRequesterFriends,
 } from "../utils";
+import { isVisible, requetsToggle } from "../features/togglesSlice";
 
-interface Props {
-  isROpen: boolean;
-  setIsROpen: React.Dispatch<React.SetStateAction<boolean>>;
-}
-
-const Requests: FC<Props> = ({ isROpen, setIsROpen }) => {
+const Requests: FC = () => {
   const fiveMinutesInSeconds = 60;
   const fiveMinutesInMilliseconds = 1 * 60 * 1000;
 
   const dispatch = useDispatch();
+
+  //* toggle
+  const reqToggle = useSelector(requetsToggle);
 
   //* current user's info
   const currentUserUid = useSelector(selectUid);
@@ -167,12 +166,21 @@ const Requests: FC<Props> = ({ isROpen, setIsROpen }) => {
   return (
     <div
       className={` ${
-        !isROpen ? "hidden" : false
+        !reqToggle ? "hidden" : false
       } bg-[#55254b] mx-2 w-[95vw] small-laptop:w-[22rem] small-laptop:right-10 text-white position: absolute z-50 shadow-[0_3px_10px_rgb(0,0,0,0.2)]`}
     >
       <div className="bg-[#975ba1] p-4 ">
         <div className="flex items-center gap-16">
-          <p className="cursor-pointer" onClick={() => setIsROpen(false)}>
+          <p
+            className="cursor-pointer"
+            onClick={() =>
+              dispatch(
+                isVisible({
+                  requetsToggle: false,
+                })
+              )
+            }
+          >
             Close
           </p>
           <h1 className="text-xl">Requests</h1>
